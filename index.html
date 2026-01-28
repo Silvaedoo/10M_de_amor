@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nossa História ❤️</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <style>
+        :root {
+            --wa-bg: #e5ddd5;
+            --wa-header: #075e54;
+            --wa-sent: #dcf8c6;
+            --wa-received: #ffffff;
+            --wa-search: #f3f3f3;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--wa-bg); margin: 0; overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+
+        /* Tela de Bloqueio */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--wa-header); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 1000; color: white;
+            text-align: center;
+        }
+        #login-screen input { padding: 12px; border-radius: 20px; border: none; margin-top: 15px; width: 250px; text-align: center; font-size: 16px; outline: none; }
+        #login-screen button { margin-top: 15px; padding: 12px 25px; border-radius: 20px; border: none; background: #25d366; color: white; cursor: pointer; font-weight: bold; font-size: 16px; }
+
+        /* Estrutura Principal */
+        #main-content { display: none; flex-direction: column; height: 100vh; }
+        
+        header { background: var(--wa-header); color: white; padding: 15px; text-align: center; font-size: 1.1em; font-weight: bold; z-index: 10; }
+        
+        .search-container { background: #f0f2f5; padding: 10px; display: flex; justify-content: center; border-bottom: 1px solid #ddd; }
+        #search-input { width: 90%; max-width: 500px; padding: 10px 15px; border-radius: 20px; border: 1px solid #ccc; outline: none; font-size: 14px; }
+
+        #chat-container { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); 
+            background-attachment: fixed;
+        }
+
+        /* Balões de Mensagem */
+        .bubble { max-width: 75%; padding: 8px 12px; border-radius: 8px; margin-bottom: 10px; font-size: 14.5px; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1); word-wrap: break-word; line-height: 1.4; }
+        .sent { background-color: var(--wa-sent); align-self: flex-end; border-top-right-radius: 0; }
+        .received { background-color: var(--wa-received); align-self: flex-start; border-top-left-radius: 0; }
+
+        .sender { font-weight: bold; font-size: 11px; color: #3498db; display: block; margin-bottom: 3px; }
+        .time { font-size: 10px; color: #999; display: block; text-align: right; margin-top: 5px; }
+
+        /* Mídias */
+        img, video { max-width: 100%; border-radius: 5px; margin: 5px 0; display: block; cursor: pointer; }
+        audio { width: 100%; margin: 5px 0; }
+        .doc-link { display: flex; align-items: center; gap: 10px; color: #075e54; text-decoration: none; font-weight: bold; background: rgba(0,0,0,0.05); padding: 10px; border-radius: 5px; margin: 5px 0; font-size: 13px; border: 1px solid #ddd; }
+
+        #loading-overlay { display: none; text-align: center; padding: 20px; color: #555; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div id="login-screen">
+    <div style="font-size: 60px; margin-bottom: 10px;">🔐</div>
+    <h2 style="margin: 5px;">Nossa História</h2>
+    <p>Digite a senha especial para acessar:</p>
+    <input type="password" id="password-input" placeholder="******" maxlength="10">
+    <button onclick="verificarSenha()">Abrir Baú de Memórias</button>
+</div>
+
+<div id="main-content">
+    <header>História de Eduardo ❤️ e Andressa 🙏🏽</header>
+    
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="🔍 Buscar por palavra ou arquivo..." onkeyup="filtrar()">
+    </div>
+
+    <div id="loading-overlay">Carregando mensagens...</div>
+    
+    <div id="chat-container"></div>
+</div>
+
+<script>
+    // CREDENCIAIS FORNECIDAS
+    const SENHA_MESTRE = "160525"; 
+    const SUPABASE_URL = "https://ucbxiyleuxxnlstehahw.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjYnhpeWxldXh4bmxzdGVoYWh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2MzQyMjQsImV4cCI6MjA4NTIxMDIyNH0.KGWc4Cm5-360GhuVSUpzz5eUczVL73UZTjSV2rVLZ5A";
+
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let todasAsMensagens = [];
+
+    // 1. Validação de Senha
+    function verificarSenha() {
+        const input = document.getElementById('password-input').value;
+        if (input === SENHA_MESTRE) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'flex';
+            document.getElementById('loading-overlay').style.display = 'block';
+            carregarDados();
+        } else {
+            alert("Senha incorreta, meu amor! ❤️ Tente novamente.");
+        }
+    }
+
+    // 2. Busca no Supabase
+    async function carregarDados() {
+        const { data, error } = await _supabase
+            .from('conversa')
+            .select('*')
+            .order('timestamp', { ascending: true });
+
+        document.getElementById('loading-overlay').style.display = 'none';
+
+        if (error) {
+            console.error("Erro Supabase:", error);
+            alert("Erro ao carregar as mensagens. Verifique a conexão.");
+            return;
+        }
+
+        todasAsMensagens = data;
+        renderizar(todasAsMensagens);
+        
+        // Rolar para o final automaticamente após carregar
+        const container = document.getElementById('chat-container');
+        container.scrollTop = container.scrollHeight;
+    }
+
+    // 3. Renderização Estilizada (WhatsApp Style)
+    function renderizar(lista) {
+        const chat = document.getElementById('chat-container');
+        chat.innerHTML = '';
+
+        if (lista.length === 0) {
+            chat.innerHTML = '<div style="text-align: center; padding: 50px; color: #777;">Aguardando o upload das mensagens...</div>';
+            return;
+        }
+
+        lista.forEach(msg => {
+            // Identifica remetente para definir cor do balão
+            const isSentByMe = msg.sender && msg.sender.includes("Eduardo");
+            const bubble = document.createElement('div');
+            bubble.className = `bubble ${isSentByMe ? 'sent' : 'received'}`;
+
+            let conteudoHTML = `<span class="sender">${msg.sender}</span>`;
+
+            // Lógica de Mídia baseada no tipo
+            if (msg.type === 'image') {
+                conteudoHTML += `<img src="${msg.content}" loading="lazy" onclick="window.open(this.src)">`;
+            } else if (msg.type === 'video') {
+                conteudoHTML += `<video controls><source src="${msg.content}"></video>`;
+            } else if (msg.type === 'audio') {
+                conteudoHTML += `<audio controls><source src="${msg.content}"></audio>`;
+            } else if (msg.file_name && msg.type !== 'text') {
+                // Para PDF, Excel, Word
+                conteudoHTML += `<a href="${msg.content}" target="_blank" class="doc-link">📄 Documento: ${msg.file_name}</a>`;
+            } else {
+                conteudoHTML += `<span>${msg.content}</span>`;
+            }
+
+            // Data e Hora
+            const dataHora = new Date(msg.timestamp).toLocaleString('pt-BR', {
+                day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+            });
+            conteudoHTML += `<span class="time">${dataHora}</span>`;
+
+            bubble.innerHTML = conteudoHTML;
+            chat.appendChild(bubble);
+        });
+    }
+
+    // 4. Sistema de Filtro (Busca)
+    function filtrar() {
+        const termo = document.getElementById('search-input').value.toLowerCase();
+        const filtradas = todasAsMensagens.filter(m => 
+            (m.content && m.content.toLowerCase().includes(termo)) || 
+            (m.file_name && m.file_name.toLowerCase().includes(termo))
+        );
+        renderizar(filtradas);
+    }
+</script>
+
+</body>
+</html>
