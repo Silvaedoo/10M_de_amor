@@ -2,8 +2,8 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dez meses de amor ❤️</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nossa História ❤️</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <style>
         :root {
@@ -11,79 +11,92 @@
             --wa-header: #075e54;
             --wa-sent: #dcf8c6;
             --wa-received: #ffffff;
-            --wa-search: #f3f3f3;
+            --wa-search: #f0f2f5;
         }
 
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--wa-bg); margin: 0; overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+        /* Reset para Mobile */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--wa-bg); margin: 0; display: flex; flex-direction: column; height: 100vh; height: -webkit-fill-available; overflow: hidden; }
 
-        /* Tela de Bloqueio */
+        /* Tela de Login Responsiva */
         #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--wa-header); display: flex; flex-direction: column;
-            align-items: center; justify-content: center; z-index: 1000; color: white;
-            text-align: center;
+            align-items: center; justify-content: center; z-index: 1000; color: white; padding: 20px;
         }
-        #login-screen input { padding: 12px; border-radius: 20px; border: none; margin-top: 15px; width: 250px; text-align: center; font-size: 16px; outline: none; }
-        #login-screen button { margin-top: 15px; padding: 12px 25px; border-radius: 20px; border: none; background: #25d366; color: white; cursor: pointer; font-weight: bold; font-size: 16px; }
+        #login-screen input { padding: 15px; border-radius: 25px; border: none; margin-top: 20px; width: 100%; max-width: 280px; text-align: center; font-size: 18px; outline: none; }
+        #login-screen button { margin-top: 15px; padding: 15px 30px; border-radius: 25px; border: none; background: #25d366; color: white; cursor: pointer; font-weight: bold; font-size: 18px; width: 100%; max-width: 280px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
-        /* Estrutura Principal */
+        /* Header e Busca */
         #main-content { display: none; flex-direction: column; height: 100vh; }
+        header { background: var(--wa-header); color: white; padding: 12px; text-align: center; font-size: 1rem; font-weight: bold; position: sticky; top: 0; z-index: 10; }
         
-        header { background: var(--wa-header); color: white; padding: 15px; text-align: center; font-size: 1.1em; font-weight: bold; z-index: 10; }
-        
-        .search-container { background: #f0f2f5; padding: 10px; display: flex; justify-content: center; border-bottom: 1px solid #ddd; }
-        #search-input { width: 90%; max-width: 500px; padding: 10px 15px; border-radius: 20px; border: 1px solid #ccc; outline: none; font-size: 14px; }
+        .search-container { background: var(--wa-search); padding: 8px 12px; display: flex; justify-content: center; border-bottom: 1px solid #ddd; }
+        #search-input { width: 100%; max-width: 600px; padding: 10px 15px; border-radius: 20px; border: 1px solid #ccc; outline: none; font-size: 16px; /* Evita zoom automático no iOS */ }
 
+        /* Área de Chat Otimizada */
         #chat-container { 
             flex: 1; 
             overflow-y: auto; 
-            padding: 20px; 
+            padding: 15px 10px; 
             display: flex; 
             flex-direction: column; 
             background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); 
-            background-attachment: fixed;
+            background-size: 400px;
         }
 
-        /* Balões de Mensagem */
-        .bubble { max-width: 75%; padding: 8px 12px; border-radius: 8px; margin-bottom: 10px; font-size: 14.5px; position: relative; box-shadow: 0 1px 1px rgba(0,0,0,0.1); word-wrap: break-word; line-height: 1.4; }
+        /* Balões Mobile-First */
+        .bubble { 
+            max-width: 85%; 
+            padding: 8px 10px; 
+            border-radius: 8px; 
+            margin-bottom: 8px; 
+            font-size: 15px; 
+            position: relative; 
+            box-shadow: 0 1px 2px rgba(0,0,0,0.15); 
+            word-wrap: break-word; 
+            line-height: 1.4; 
+        }
         .sent { background-color: var(--wa-sent); align-self: flex-end; border-top-right-radius: 0; }
         .received { background-color: var(--wa-received); align-self: flex-start; border-top-left-radius: 0; }
 
-        .sender { font-weight: bold; font-size: 11px; color: #3498db; display: block; margin-bottom: 3px; }
-        .time { font-size: 10px; color: #999; display: block; text-align: right; margin-top: 5px; }
+        .sender { font-weight: bold; font-size: 11px; color: #3498db; display: block; margin-bottom: 2px; }
+        .time { font-size: 10px; color: #888; text-align: right; margin-top: 4px; display: block; }
 
-        /* Mídias */
-        img, video { max-width: 100%; border-radius: 5px; margin: 5px 0; display: block; cursor: pointer; }
-        audio { width: 100%; margin: 5px 0; }
-        .doc-link { display: flex; align-items: center; gap: 10px; color: #075e54; text-decoration: none; font-weight: bold; background: rgba(0,0,0,0.05); padding: 10px; border-radius: 5px; margin: 5px 0; font-size: 13px; border: 1px solid #ddd; }
+        /* Mídias Responsivas */
+        img, video { width: 100%; max-width: 100%; border-radius: 6px; margin: 4px 0; display: block; height: auto; }
+        audio { width: 100%; margin: 5px 0; height: 35px; }
+        
+        .doc-link { 
+            display: flex; align-items: center; gap: 8px; color: #075e54; 
+            text-decoration: none; font-weight: bold; background: rgba(0,0,0,0.04); 
+            padding: 12px; border-radius: 6px; margin: 5px 0; font-size: 13px; 
+            border: 1px solid #ddd;
+        }
 
-        #loading-overlay { display: none; text-align: center; padding: 20px; color: #555; font-weight: bold; }
+        #loading-overlay { text-align: center; padding: 20px; color: #555; font-weight: bold; background: #fff; border-bottom: 1px solid #eee; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
-    <div style="font-size: 60px; margin-bottom: 10px;">🔐</div>
-    <h2 style="margin: 5px;">Nossa História</h2>
-    <p>Digite a senha especial para acessar:</p>
-    <input type="password" id="password-input" placeholder="******" maxlength="10">
-    <button onclick="verificarSenha()">Abrir Baú de Memórias</button>
+    <div style="font-size: 60px;">🔐</div>
+    <h2 style="margin: 10px 0;">Nossa História</h2>
+    <p style="opacity: 0.9; font-size: 14px;">Digite a senha especial para entrar:</p>
+    <input type="password" id="password-input" placeholder="Senha" inputmode="numeric">
+    <button onclick="verificarSenha()">Ver Mensagens</button>
 </div>
 
 <div id="main-content">
     <header>História de Eduardo ❤️ e Andressa 🙏🏽</header>
-    
     <div class="search-container">
-        <input type="text" id="search-input" placeholder="🔍 Buscar por palavra ou arquivo..." onkeyup="filtrar()">
+        <input type="text" id="search-input" placeholder="🔍 Buscar na conversa..." onkeyup="filtrar()">
     </div>
-
-    <div id="loading-overlay">Carregando mensagens...</div>
-    
+    <div id="loading-overlay" style="display:none;">Carregando mensagens...</div>
     <div id="chat-container"></div>
 </div>
 
 <script>
-    // CREDENCIAIS FORNECIDAS
     const SENHA_MESTRE = "160525"; 
     const SUPABASE_URL = "https://ucbxiyleuxxnlstehahw.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjYnhpeWxldXh4bmxzdGVoYWh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2MzQyMjQsImV4cCI6MjA4NTIxMDIyNH0.KGWc4Cm5-360GhuVSUpzz5eUczVL73UZTjSV2rVLZ5A";
@@ -91,96 +104,52 @@
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     let todasAsMensagens = [];
 
-    // 1. Validação de Senha
     function verificarSenha() {
-        const input = document.getElementById('password-input').value;
-        if (input === SENHA_MESTRE) {
+        if (document.getElementById('password-input').value === SENHA_MESTRE) {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('main-content').style.display = 'flex';
             document.getElementById('loading-overlay').style.display = 'block';
             carregarDados();
-        } else {
-            alert("Senha incorreta, meu amor! ❤️ Tente novamente.");
-        }
+        } else { alert("Senha incorreta! ❤️"); }
     }
 
-    // 2. Busca no Supabase
     async function carregarDados() {
-        const { data, error } = await _supabase
-            .from('conversa')
-            .select('*')
-            .order('timestamp', { ascending: true });
-
+        const { data, error } = await _supabase.from('conversa').select('*').order('timestamp', { ascending: true });
         document.getElementById('loading-overlay').style.display = 'none';
-
-        if (error) {
-            console.error("Erro Supabase:", error);
-            alert("Erro ao carregar as mensagens. Verifique a conexão.");
-            return;
-        }
-
+        if (error) return alert("Erro ao carregar dados.");
         todasAsMensagens = data;
-        renderizar(todasAsMensagens);
-        
-        // Rolar para o final automaticamente após carregar
-        const container = document.getElementById('chat-container');
-        container.scrollTop = container.scrollHeight;
+        renderizar(data);
+        const chat = document.getElementById('chat-container');
+        chat.scrollTop = chat.scrollHeight;
     }
 
-    // 3. Renderização Estilizada (WhatsApp Style)
     function renderizar(lista) {
         const chat = document.getElementById('chat-container');
-        chat.innerHTML = '';
-
-        if (lista.length === 0) {
-            chat.innerHTML = '<div style="text-align: center; padding: 50px; color: #777;">Aguardando o upload das mensagens...</div>';
-            return;
-        }
+        chat.innerHTML = lista.length === 0 ? '<div style="text-align:center;padding:50px;color:#777;">Aguardando mensagens...</div>' : '';
 
         lista.forEach(msg => {
-            // Identifica remetente para definir cor do balão
-            const isSentByMe = msg.sender && msg.sender.includes("Eduardo");
+            const isSent = msg.sender && msg.sender.includes("Eduardo");
             const bubble = document.createElement('div');
-            bubble.className = `bubble ${isSentByMe ? 'sent' : 'received'}`;
+            bubble.className = `bubble ${isSent ? 'sent' : 'received'}`;
 
-            let conteudoHTML = `<span class="sender">${msg.sender}</span>`;
+            let html = `<span class="sender">${msg.sender}</span>`;
+            if (msg.type === 'image') html += `<img src="${msg.content}" loading="lazy" onclick="window.open(this.src)">`;
+            else if (msg.type === 'video') html += `<video controls playsinline><source src="${msg.content}"></video>`;
+            else if (msg.type === 'audio') html += `<audio controls><source src="${msg.content}"></audio>`;
+            else if (msg.file_name && msg.type !== 'text') html += `<a href="${msg.content}" target="_blank" class="doc-link">📄 ${msg.file_name}</a>`;
+            else html += `<span>${msg.content}</span>`;
 
-            // Lógica de Mídia baseada no tipo
-            if (msg.type === 'image') {
-                conteudoHTML += `<img src="${msg.content}" loading="lazy" onclick="window.open(this.src)">`;
-            } else if (msg.type === 'video') {
-                conteudoHTML += `<video controls><source src="${msg.content}"></video>`;
-            } else if (msg.type === 'audio') {
-                conteudoHTML += `<audio controls><source src="${msg.content}"></audio>`;
-            } else if (msg.file_name && msg.type !== 'text') {
-                // Para PDF, Excel, Word
-                conteudoHTML += `<a href="${msg.content}" target="_blank" class="doc-link">📄 Documento: ${msg.file_name}</a>`;
-            } else {
-                conteudoHTML += `<span>${msg.content}</span>`;
-            }
-
-            // Data e Hora
-            const dataHora = new Date(msg.timestamp).toLocaleString('pt-BR', {
-                day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
-            });
-            conteudoHTML += `<span class="time">${dataHora}</span>`;
-
-            bubble.innerHTML = conteudoHTML;
+            const dataHora = new Date(msg.timestamp).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+            html += `<span class="time">${dataHora}</span>`;
+            bubble.innerHTML = html;
             chat.appendChild(bubble);
         });
     }
 
-    // 4. Sistema de Filtro (Busca)
     function filtrar() {
-        const termo = document.getElementById('search-input').value.toLowerCase();
-        const filtradas = todasAsMensagens.filter(m => 
-            (m.content && m.content.toLowerCase().includes(termo)) || 
-            (m.file_name && m.file_name.toLowerCase().includes(termo))
-        );
-        renderizar(filtradas);
+        const t = document.getElementById('search-input').value.toLowerCase();
+        renderizar(todasAsMensagens.filter(m => (m.content && m.content.toLowerCase().includes(t)) || (m.file_name && m.file_name.toLowerCase().includes(t))));
     }
 </script>
-
 </body>
-
 </html>
