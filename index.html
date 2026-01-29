@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dez meses de Amor ❤️</title>
+    <title>10 Meses de Amor ❤️</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <style>
         :root {
@@ -14,11 +14,10 @@
             --wa-search: #f0f2f5;
         }
 
-        /* Reset Responsivo para Mobile */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--wa-bg); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
-        /* Tela de Login Otimizada */
+        /* Tela de Login */
         #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--wa-header); display: flex; flex-direction: column;
@@ -27,24 +26,24 @@
         #login-screen input { padding: 15px; border-radius: 25px; border: none; margin-top: 20px; width: 100%; max-width: 280px; text-align: center; font-size: 18px; outline: none; }
         #login-screen button { margin-top: 15px; padding: 15px 30px; border-radius: 25px; border: none; background: #25d366; color: white; cursor: pointer; font-weight: bold; font-size: 18px; width: 100%; max-width: 280px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
-        /* Layout do Chat */
+        /* Layout Principal */
         #main-content { display: none; flex-direction: column; height: 100vh; }
         header { background: var(--wa-header); color: white; padding: 12px; text-align: center; font-size: 1.1em; font-weight: bold; position: sticky; top: 0; z-index: 10; }
         
         .search-container { background: var(--wa-search); padding: 8px 12px; display: flex; justify-content: center; border-bottom: 1px solid #ddd; }
         #search-input { width: 100%; max-width: 600px; padding: 10px 15px; border-radius: 20px; border: 1px solid #ccc; outline: none; font-size: 16px; }
 
+        /* CONTAINER MÁGICO: column-reverse faz as msgs novas colarem embaixo */
         #chat-container { 
             flex: 1; 
             overflow-y: auto; 
             padding: 15px 10px; 
             display: flex; 
-            flex-direction: column; 
+            flex-direction: column-reverse; 
             background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); 
             background-size: 400px;
         }
 
-        /* Balões Mobile-First */
         .bubble { max-width: 85%; padding: 8px 10px; border-radius: 8px; margin-bottom: 8px; font-size: 15px; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.15); word-wrap: break-word; line-height: 1.4; }
         .sent { background-color: var(--wa-sent); align-self: flex-end; border-top-right-radius: 0; }
         .received { background-color: var(--wa-received); align-self: flex-start; border-top-left-radius: 0; }
@@ -52,35 +51,33 @@
         .sender { font-weight: bold; font-size: 11px; color: #3498db; display: block; margin-bottom: 2px; }
         .time { font-size: 10px; color: #888; text-align: right; margin-top: 4px; display: block; }
 
-        /* Mídias */
-        img, video { width: 100%; max-width: 100%; border-radius: 6px; margin: 4px 0; display: block; height: auto; cursor: pointer; }
+        img, video { width: 100%; max-width: 100%; border-radius: 6px; margin: 4px 0; display: block; height: auto; }
         audio { width: 100%; margin: 5px 0; height: 35px; }
         .doc-link { display: flex; align-items: center; gap: 8px; color: #075e54; text-decoration: none; font-weight: bold; background: rgba(0,0,0,0.04); padding: 12px; border-radius: 6px; margin: 5px 0; font-size: 13px; border: 1px solid #ddd; }
 
-        #loading-overlay { text-align: center; padding: 20px; color: #555; font-weight: bold; background: #fff; border-bottom: 1px solid #eee; }
+        #loading-overlay { text-align: center; padding: 10px; color: #555; font-weight: bold; background: #fff; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
     <div style="font-size: 60px;">🔐</div>
-    <h2 style="margin: 10px 0;">Nossa História</h2>
-    <p style="opacity: 0.9; font-size: 14px;">Digite a senha especial para entrar:</p>
+    <h2 style="margin: 10px 0;">10 Meses de Amor</h2>
+    <p style="opacity: 0.9; font-size: 14px;">Digite a nossa data especial:</p>
     <input type="password" id="password-input" placeholder="Senha" inputmode="numeric">
-    <button onclick="verificarSenha()">Abrir Baú de Memórias</button>
+    <button onclick="verificarSenha()">Entrar</button>
 </div>
 
 <div id="main-content">
-    <header>História de Eduardo ❤️ e Andressa 🙏🏽</header>
+    <header>10 Meses de Amor ❤️</header>
     <div class="search-container">
-        <input type="text" id="search-input" placeholder="🔍 Buscar por palavra ou arquivo..." onkeyup="filtrar()">
+        <input type="text" id="search-input" placeholder="🔍 Buscar na conversa..." onkeyup="filtrar()">
     </div>
     <div id="loading-overlay" style="display:none;">Carregando mensagens...</div>
     <div id="chat-container"></div>
 </div>
 
 <script>
-    // CREDENCIAIS
     const SENHA_MESTRE = "160525"; 
     const SUPABASE_URL = "https://ucbxiyleuxxnlstehahw.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjYnhpeWxldXh4bmxzdGVoYWh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2MzQyMjQsImV4cCI6MjA4NTIxMDIyNH0.KGWc4Cm5-360GhuVSUpzz5eUczVL73UZTjSV2rVLZ5A";
@@ -94,15 +91,16 @@
             document.getElementById('main-content').style.display = 'flex';
             document.getElementById('loading-overlay').style.display = 'block';
             carregarDados();
-        } else { alert("Senha incorreta! ❤️"); }
+        } else { alert("Data incorreta! ❤️"); }
     }
 
     async function carregarDados() {
-        // Correção: Ordem decrescente para ver o "hoje" primeiro
+        // Buscamos em ordem ASCENDENTE (do antigo pro novo)
+        // O CSS column-reverse vai inverter visualmente, colocando a última embaixo.
         const { data, error } = await _supabase
             .from('conversa')
             .select('*')
-            .order('timestamp', { ascending: false });
+            .order('timestamp', { ascending: true });
 
         document.getElementById('loading-overlay').style.display = 'none';
         if (error) return alert("Erro ao carregar dados.");
@@ -112,43 +110,56 @@
 
     function renderizar(lista) {
         const chat = document.getElementById('chat-container');
-        chat.innerHTML = lista.length === 0 ? '<div style="text-align:center;padding:50px;color:#777;">Aguardando mensagens...</div>' : '';
+        chat.innerHTML = ''; 
 
-        lista.forEach(msg => {
+        // Como usamos column-reverse, precisamos inverter a lista para a lógica bater
+        const listaParaExibir = [...lista].reverse();
+
+        listaParaExibir.forEach(msg => {
             const isSent = msg.sender && msg.sender.includes("Eduardo");
             const bubble = document.createElement('div');
             bubble.className = `bubble ${isSent ? 'sent' : 'received'}`;
 
-            let html = `<span class="sender">${msg.sender}</span>`;
+            let corpo = `<span class="sender">${msg.sender}</span>`;
             
-            // Verificação Inteligente de Mídia (Inclui WebP)
-            const isImage = msg.type === 'image' || (msg.file_name && msg.file_name.toLowerCase().endsWith('.webp'));
+            // CORREÇÃO WEBP: Verifica extensão e tipo
+            const eImagem = msg.type === 'image' || 
+                            (msg.file_name && msg.file_name.toLowerCase().endsWith('.webp')) ||
+                            (msg.content && msg.content.toLowerCase().includes('.webp'));
             
-            if (isImage) {
-                html += `<img src="${msg.content}" loading="lazy" onclick="window.open(this.src)">`;
+            if (eImagem) {
+                corpo += `<img src="${msg.content}" loading="lazy">`;
             } else if (msg.type === 'video') {
-                html += `<video controls playsinline><source src="${msg.content}"></video>`;
+                corpo += `<video controls playsinline><source src="${msg.content}"></video>`;
             } else if (msg.type === 'audio') {
-                html += `<audio controls><source src="${msg.content}"></audio>`;
+                corpo += `<audio controls><source src="${msg.content}"></audio>`;
             } else if (msg.file_name && msg.type !== 'text') {
-                html += `<a href="${msg.content}" target="_blank" class="doc-link">📄 ${msg.file_name}</a>`;
+                corpo += `<a href="${msg.content}" target="_blank" class="doc-link">📄 ${msg.file_name}</a>`;
             } else {
-                html += `<span>${msg.content}</span>`;
+                corpo += `<span>${msg.content}</span>`;
             }
 
             const dataHora = new Date(msg.timestamp).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
-            html += `<span class="time">${dataHora}</span>`;
-            bubble.innerHTML = html;
+            corpo += `<span class="time">${dataHora}</span>`;
+            bubble.innerHTML = corpo;
             chat.appendChild(bubble);
         });
     }
 
+    // BUSCA OTIMIZADA: Agora funciona com delay para não travar
+    let timeoutBusca;
     function filtrar() {
-        const t = document.getElementById('search-input').value.toLowerCase();
-        renderizar(todasAsMensagens.filter(m => 
-            (m.content && m.content.toLowerCase().includes(t)) || 
-            (m.file_name && m.file_name.toLowerCase().includes(t))
-        ));
+        clearTimeout(timeoutBusca);
+        timeoutBusca = setTimeout(() => {
+            const t = document.getElementById('search-input').value.toLowerCase();
+            if (t.length > 0 && t.length < 3) return; // Só busca com 3+ letras
+            
+            const filtradas = todasAsMensagens.filter(m => 
+                (m.content && m.content.toLowerCase().includes(t)) || 
+                (m.file_name && m.file_name.toLowerCase().includes(t))
+            );
+            renderizar(filtradas);
+        }, 300);
     }
 </script>
 </body>
